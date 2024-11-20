@@ -9,15 +9,27 @@ exports.getProducts = async (req, res) => {
     }
 };
 
+exports.getProductById = async (req, res) => {
+    const { id } = req.params;
+
+    try {
+        const product = await Product.findById(id);
+
+        if (!product) {
+            return res.status(404).json({ message: 'Produit inexistant ou introuvable' });
+        }
+
+        res.status(200).json(product);
+    } catch (err) {
+        res.status(500).json({ message: 'Erreur serveur' });
+    }
+};
+
 exports.createProduct = async (req, res) => {
     const { name, type, price, rating, warranty_years, available } = req.body;
 
     try {
         const product = await Product.create({ name, type, price, rating, warranty_years, available });
-
-        // Émettre un événement WebSocket après la création du produit
-        req.io.emit('new-product', product);
-
         res.status(201).json(product);
     } catch (err) {
         res.status(500).json({ message: 'Erreur serveur' });
@@ -39,9 +51,6 @@ exports.updateProduct = async (req, res) => {
             return res.status(404).json({ message: 'Produit inexistant ou introuvable' });
         }
 
-        // Émettre un événement WebSocket après la mise à jour du produit
-        req.io.emit('update-product', product);
-
         res.status(200).json(product);
     } catch (err) {
         res.status(500).json({ message: 'Erreur serveur' });
@@ -57,9 +66,6 @@ exports.deleteProduct = async (req, res) => {
         if (!product) {
             return res.status(404).json({ message: 'Produit inexistant ou introuvable' });
         }
-
-        // Émettre un événement WebSocket après la suppression du produit
-        req.io.emit('delete-product', id);
 
         res.status(200).json({ message: 'Produit supprimé' });
     } catch (err) {

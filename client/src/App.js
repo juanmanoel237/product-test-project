@@ -35,7 +35,7 @@ function App() {
           </Box>
         </Container>
         
-        {/* Footer avec MUI */}
+       
         <Footer />
       </div>
     </Router>

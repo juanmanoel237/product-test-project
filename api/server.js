@@ -1,15 +1,11 @@
-const express = require('express')
-const mongoose = require('mongoose')
-const cors = require('cors')
-const socketIo = require('socket.io')
+const express = require('express');
+const mongoose = require('mongoose');
+const cors = require('cors');
 const dotenv = require('dotenv');
-const http = require('http');
 
-dotenv.config()
+dotenv.config();
 
-const app = express()
-const server = http.createServer(app)
-const io = socketIo(server)
+const app = express();
 
 const PORT = process.env.PORT || 5000;
 
@@ -20,25 +16,13 @@ app.use(express.json());
 const authRoutes = require('./routes/auth');
 const productRoutes = require('./routes/product');
 
-// Injecter l'instance de io dans les routes
 app.use('/api/auth', authRoutes);
-app.use('/api/products', (req, res, next) => {
-  req.io = io;  // Ajouter io aux requêtes
-  next();
-}, productRoutes);
-
-io.on('connection', (socket) => {
-  console.log('Un utilisateur est connecté');
-  
-  socket.on('disconnect', () => {
-    console.log('Utilisateur déconnecté');
-  });
-});
+app.use('/api/products', productRoutes);
 
 mongoose.connect(process.env.MONGODB_URI)
     .then(() => console.log('MongoDB connecté'))
-    .catch((err) => console.log('MongoDB erreur:', err))
+    .catch((err) => console.log('MongoDB erreur:', err));
 
-server.listen(PORT, () => {
-    console.log(`Server tourne sur le port ${PORT}`)
-})
+app.listen(PORT, () => {
+    console.log(`Server tourne sur le port ${PORT}`);
+});

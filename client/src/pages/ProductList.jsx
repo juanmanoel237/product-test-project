@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import {
   Box,
@@ -9,10 +10,12 @@ import {
   CircularProgress,
 } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
+import EditIcon from '@mui/icons-material/Edit';
 
 const ProductList = () => {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
   // Récupération des produits
   const fetchProducts = async () => {
@@ -41,6 +44,11 @@ const ProductList = () => {
     }
   };
 
+  // Gestion du clic sur le bouton "Modifier"
+  const handleEdit = (productId) => {
+    navigate(`/edit-product/${productId}`);
+  };
+
   useEffect(() => {
     fetchProducts();
   }, []);
@@ -58,11 +66,10 @@ const ProductList = () => {
       <Typography variant="h4" gutterBottom>
         Liste des Produits
       </Typography>
-      {/* Conteneur principal avec CSS Grid */}
       <Box
         display="grid"
         gridTemplateColumns="repeat(auto-fill, minmax(300px, 1fr))"
-        gap={16} // Espacement entre les cartes
+        gap={16}
       >
         {products.map((product) => (
           <Card key={product._id}>
@@ -85,7 +92,16 @@ const ProductList = () => {
               <Typography variant="body2" color={product.available ? 'green' : 'red'}>
                 {product.available ? 'Disponible' : 'Indisponible'}
               </Typography>
-              <Box marginTop={2}>
+              <Box marginTop={2} display="flex" gap={2}>
+                <Button
+                  variant="contained"
+                  color="primary"
+                  size="small"
+                  startIcon={<EditIcon />}
+                  onClick={() => handleEdit(product._id)}
+                >
+                  Modifier
+                </Button>
                 <Button
                   variant="contained"
                   color="error"
