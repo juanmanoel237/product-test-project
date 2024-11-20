@@ -16,18 +16,24 @@ const PORT = process.env.PORT || 5000;
 app.use(cors());
 app.use(express.json());
 
+// Routes
 const authRoutes = require('./routes/auth');
-const productRoutes = require('./routes/product')
+const productRoutes = require('./routes/product');
 
-app.use('/api/auth', authRoutes)
-app.use('/api/products', productRoutes)
+// Injecter l'instance de io dans les routes
+app.use('/api/auth', authRoutes);
+app.use('/api/products', (req, res, next) => {
+  req.io = io;  // Ajouter io aux requêtes
+  next();
+}, productRoutes);
 
-io.on('connection', (socket)=>{
-    console.log('Un utilisateur est connecté');
-    socket.on('disconnect', ()=>{
-        console.log('Utilisateur déconnecté');
-    })
-})
+io.on('connection', (socket) => {
+  console.log('Un utilisateur est connecté');
+  
+  socket.on('disconnect', () => {
+    console.log('Utilisateur déconnecté');
+  });
+});
 
 mongoose.connect(process.env.MONGODB_URI)
     .then(() => console.log('MongoDB connecté'))

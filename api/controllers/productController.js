@@ -1,54 +1,68 @@
-const Product = require('../models/Product')
+const Product = require('../models/Product');
 
 exports.getProducts = async (req, res) => {
     try {
-        const products = await Product.find()
-        res.status(200).json(products)
+        const products = await Product.find();
+        res.status(200).json(products);
     } catch (err) {
-        res.status(500).json({ message: 'Erreur serveur' })
+        res.status(500).json({ message: 'Erreur serveur' });
     }
-}
+};
 
 exports.createProduct = async (req, res) => {
-    const { name, type, price, rating, warranty_years, available } = req.body
+    const { name, type, price, rating, warranty_years, available } = req.body;
 
     try {
-        const product = await Product.create({ name, type, price, rating, warranty_years, available })
-        res.status(201).json(product)
+        const product = await Product.create({ name, type, price, rating, warranty_years, available });
+
+        // Émettre un événement WebSocket après la création du produit
+        req.io.emit('new-product', product);
+
+        res.status(201).json(product);
     } catch (err) {
-        res.status(500).json({ message: 'Erreur serveur' })
+        res.status(500).json({ message: 'Erreur serveur' });
     }
-}
+};
 
 exports.updateProduct = async (req, res) => {
-    const { id } = req.params
-    const { name, type, price, rating, warranty_years, available } = req.body
+    const { id } = req.params;
+    const { name, type, price, rating, warranty_years, available } = req.body;
 
     try {
         const product = await Product.findByIdAndUpdate(
             id, 
             { name, type, price, rating, warranty_years, available }, 
             { new: true }
-        )
+        );
+
         if (!product) {
-            return res.status(404).json({ message: 'Produit inexistant ou introuvable' })
+            return res.status(404).json({ message: 'Produit inexistant ou introuvable' });
         }
-        return res.status(200).json(product)
+
+        // Émettre un événement WebSocket après la mise à jour du produit
+        req.io.emit('update-product', product);
+
+        res.status(200).json(product);
     } catch (err) {
-        res.status(500).json({ message: 'Erreur serveur' })
+        res.status(500).json({ message: 'Erreur serveur' });
     }
-}
+};
 
 exports.deleteProduct = async (req, res) => {
-    const { id } = req.params
+    const { id } = req.params;
 
     try {
-        const product = await Product.findByIdAndDelete(id)
+        const product = await Product.findByIdAndDelete(id);
+
         if (!product) {
-            return res.status(404).json({ message: 'Produit inexistant ou introuvable' })
+            return res.status(404).json({ message: 'Produit inexistant ou introuvable' });
         }
-        return res.status(200).json({ message: 'Produit supprimé' })
+
+        // Émettre un événement WebSocket après la suppression du produit
+        req.io.emit('delete-product', id);
+
+        res.status(200).json({ message: 'Produit supprimé' });
     } catch (err) {
-        res.status(500).json({ message: 'Erreur serveur' })
+        res.status(500).json({ message: 'Erreur serveur' });
     }
-}
+};
