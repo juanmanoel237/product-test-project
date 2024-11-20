@@ -9,7 +9,7 @@ exports.getProducts = async (req, res) => {
     }
 }
 
-exports.createproduct = async (req, res) => {
+exports.createProduct = async (req, res) => {
     const { name, type, price, rating, warranty_years, available } = req.body
 
     try {
