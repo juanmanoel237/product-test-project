@@ -8,13 +8,6 @@ const generateToken = (id)=>{
 exports.register = async (req, res) => {
     const {email, password} = req.body
 
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-        return res.status(400).json({ 
-            message: 'Format d\'email invalide' 
-        });
-    }
-
     try{
         const existingUser = await User.findOne({email})
 
@@ -48,7 +41,7 @@ exports.login = async (req, res) => {
             return res.status(400).json({message:'Identifiants invalides.'})
         }
 
-        const isMatch = await user.comparePassword(password)
+        const isMatch = await user.matchPassword(password)
         if(!isMatch){
             return res.status(400).json({message:'Identifiants invalides.'})
         }
