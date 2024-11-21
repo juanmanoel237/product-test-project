@@ -7,6 +7,11 @@ const productSchema = new mongoose.Schema({
   rating: { type: Number, required: true },
   warranty_years: { type: Number, required: true },
   available: { type: Boolean, required: true },
+  userId: { 
+    type: mongoose.Schema.Types.ObjectId, 
+    ref: 'User', 
+    required: true, 
+  },
 });
 
 module.exports = mongoose.model('Product', productSchema);
