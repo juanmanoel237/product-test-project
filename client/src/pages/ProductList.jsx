@@ -17,6 +17,9 @@ const ProductList = () => {
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
+  // Vérifier si l'utilisateur est connecté en fonction du token
+  const isAuthenticated = !!localStorage.getItem('token');
+
   // Récupération des produits
   const fetchProducts = async () => {
     try {
@@ -31,6 +34,7 @@ const ProductList = () => {
 
   // Suppression d'un produit
   const deleteProduct = async (productId) => {
+    if (!isAuthenticated) return; // Si l'utilisateur n'est pas connecté, on ne fait rien
     try {
       await axios.delete(`http://localhost:5000/api/products/${productId}`, {
         headers: {
@@ -46,6 +50,7 @@ const ProductList = () => {
 
   // Gestion du clic sur le bouton "Modifier"
   const handleEdit = (productId) => {
+    if (!isAuthenticated) return; // Si l'utilisateur n'est pas connecté, on ne fait rien
     navigate(`/edit-product/${productId}`);
   };
 
@@ -93,24 +98,28 @@ const ProductList = () => {
                 {product.available ? 'Disponible' : 'Indisponible'}
               </Typography>
               <Box marginTop={2} display="flex" gap={2}>
-                <Button
-                  variant="contained"
-                  color="primary"
-                  size="small"
-                  startIcon={<EditIcon />}
-                  onClick={() => handleEdit(product._id)}
-                >
-                  Modifier
-                </Button>
-                <Button
-                  variant="contained"
-                  color="error"
-                  size="small"
-                  startIcon={<DeleteIcon />}
-                  onClick={() => deleteProduct(product._id)}
-                >
-                  Supprimer
-                </Button>
+                {isAuthenticated && (
+                  <>
+                    <Button
+                      variant="contained"
+                      color="primary"
+                      size="small"
+                      startIcon={<EditIcon />}
+                      onClick={() => handleEdit(product._id)}
+                    >
+                      Modifier
+                    </Button>
+                    <Button
+                      variant="contained"
+                      color="error"
+                      size="small"
+                      startIcon={<DeleteIcon />}
+                      onClick={() => deleteProduct(product._id)}
+                    >
+                      Supprimer
+                    </Button>
+                  </>
+                )}
               </Box>
             </CardContent>
           </Card>
